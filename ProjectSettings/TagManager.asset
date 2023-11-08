@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Environmnet
+  - Fruit
+  - NPC
+  - Stranger
+  - ThrowFruit
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - NPC
+  - Player
+  - Fruit
+  - ThrowFruit
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Environment
+    uniqueID: 437102567
+    locked: 0
+  - name: Fruit
+    uniqueID: 865232407
+    locked: 0
+  - name: NPC
+    uniqueID: 715436413
+    locked: 0
+  - name: Player
+    uniqueID: 2122066747
+    locked: 0
