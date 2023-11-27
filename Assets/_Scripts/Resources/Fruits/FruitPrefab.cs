@@ -42,10 +42,10 @@ public class FruitPrefab : MonoBehaviour
         {
             return;
         }
-        if (GameManager.Instance.KarmaScore >= 50)
+        if (GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] >= 50)
         {
             decayMultiplier = 0.8f;
-            if (GameManager.Instance.KarmaScore >= 100)
+            if (GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] >= 100)
             {
                 decayMultiplier = 0.6f;
             }
@@ -77,18 +77,51 @@ public class FruitPrefab : MonoBehaviour
 
         if (TimeCount <= fruit.DecayInitialTime / 3f)
         {
-            spriteRenderer.color = Color.green;
-            FruitState = State.Green;
+            if (!fruit.HasStages)
+            {
+                spriteRenderer.color = Color.green;
+                FruitState = State.Green;
+            }
+            else
+            {
+                if (!isStored)
+                {
+                    spriteRenderer.sprite = fruit.FruitImage;
+                }
+                FruitState = State.Green;
+            }
         }
         else if (TimeCount <= 2 * fruit.DecayInitialTime / 3f)
         {
-            spriteRenderer.color = Color.yellow;
-            FruitState = State.Yellow;
+            if (!fruit.HasStages)
+            {
+                spriteRenderer.color = Color.yellow;
+                FruitState = State.Yellow;
+            }
+            else
+            {
+                if (!isStored)
+                {
+                    spriteRenderer.sprite = fruit.Stage2Image;
+                }
+                FruitState = State.Yellow;
+            }
         }
         else
         {
-            spriteRenderer.color = Color.red;
-            FruitState = State.Red;
+            if (!fruit.HasStages)
+            {
+                spriteRenderer.color = Color.red;
+                FruitState = State.Red;
+            }
+            else
+            {
+                if (!isStored)
+                {
+                    spriteRenderer.sprite = fruit.Stage3Image;
+                }
+                FruitState = State.Red;
+            }
         }
     }
 

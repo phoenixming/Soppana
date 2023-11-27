@@ -17,5 +17,8 @@ MonoBehaviour:
   decayInitialTime: 30
   decayMultiplier: 1
   decayChangeMultiplier: 2
-  fruitImage: {fileID: 21300000, guid: f25558f2cab809d43a418f8e201d98d1, type: 3}
+  fruitImage: {fileID: 21300000, guid: 47ac508afec0ec341b73eb1402313724, type: 3}
   friendPoint: 10
+  hasStages: 1
+  stage2Image: {fileID: 21300000, guid: 4e5266edc6d7aef4d99b4435bcb478b7, type: 3}
+  stage3Image: {fileID: 21300000, guid: 27e47fd28f698ee4780f23fbef1eaa56, type: 3}

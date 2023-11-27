@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 
-public class TimerManager : MonoBehaviour
+public class TimerManager : StaticInstance<TimerManager>
 {
     public static Action<bool> ChangeLightColor;
 
@@ -52,6 +52,10 @@ public class TimerManager : MonoBehaviour
         //ShowTimerUI();
         if (!GameManager.Instance.isPaulsed)
         {
+            if (text.text == "")
+            {
+                text.text = $"Day {day} {hour}:{minute}{ampm}";
+            }
             timer -= Time.deltaTime;
             if (timer < 0)
             {
@@ -65,7 +69,8 @@ public class TimerManager : MonoBehaviour
                         ResetTimer();
                         // End UI
                         EndUI.SetActive(true);
-                        EndUIText.text = $"Your Score is: {GameManager.Instance.KarmaScore}";
+                        EndUIText.text = $"Your Score is: {GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1]}";
+                        UIManager.Instance.UpdateChart();
                         GameManager.Instance.isPaulsed = true;
                     }
                     if (hour != 12)
@@ -87,7 +92,11 @@ public class TimerManager : MonoBehaviour
 
                 timer = minuteToReal;
             }
-        }        
+        }
+        else
+        {
+            text.text = "";
+        }
     }
 
     public void OnChangeLightColor()
@@ -95,7 +104,7 @@ public class TimerManager : MonoBehaviour
         ChangeLightColor?.Invoke(increase);
     }
 
-    private void ResetTimer()
+    public void ResetTimer()
     {
         day = 1;
         hour = 12;

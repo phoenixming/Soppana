@@ -15,6 +15,10 @@ public class Fruits : ScriptableObject
 
     [SerializeField] private float friendPoint;
 
+    [SerializeField] private bool hasStages;
+    [SerializeField] private Sprite stage2Image;
+    [SerializeField] private Sprite stage3Image;
+
 
     public string FruitName { get => fruitName; set => fruitName = value; }
     public Ability SpecialAbility { get => specialAbility; set => specialAbility = value; }
@@ -24,5 +28,8 @@ public class Fruits : ScriptableObject
     public Sprite FruitImage { get => fruitImage; }
     public float FriendPoint { get => friendPoint; set => friendPoint = value; }
     public float DecayMultiplier { get => decayMultiplier; set => decayMultiplier = value; }
+    public bool HasStages { get => hasStages; set => hasStages = value; }
+    public Sprite Stage2Image { get => stage2Image;}
+    public Sprite Stage3Image { get => stage3Image;}
 }
 

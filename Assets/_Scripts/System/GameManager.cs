@@ -1,15 +1,22 @@
-using System.Collections;
+using TMPro;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : StaticInstance<GameManager>
+public class GameManager : PersistentSingleton<GameManager>
 {
-    private float karmaScore = 0;
 
-    public float KarmaScore { get => karmaScore; set => karmaScore = value; }
+    public int playTime = 1;
+
+
+    public List<float> karmaScore = new(5);
+    public List<int> collectCount = new(5);
+    public List<int> giveCount = new(5);
+    public List<int> throwCount = new(5);
 
     public bool isPaulsed = false;
+
+    public bool isEnd = false;
 
     // Start is called before the first frame update
     void Start()
@@ -23,8 +30,40 @@ public class GameManager : StaticInstance<GameManager>
         
     }
 
+
+    public void UpdatePlayData()
+    {
+
+
+    }
+
     public void RePlay()
     {
         SceneManager.LoadScene(0);
+        UIManager.Instance.HealthSlider.value = 100;
+        TimerManager.Instance.ResetTimer();
+        isPaulsed = false;
+        playTime++;
+        if (playTime > 5)
+        {
+            playTime = 1;
+        }
+        isEnd = false;
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
+    public void Pause()
+    {
+        isPaulsed = true;
+    }
+
+    public void Resume()
+    {
+        isPaulsed = false;
+    }
+
 }

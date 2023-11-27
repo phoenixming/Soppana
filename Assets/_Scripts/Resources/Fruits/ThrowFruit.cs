@@ -61,7 +61,7 @@ public class ThrowFruit : MonoBehaviour
         {
             if (collision.CompareTag("Stranger"))
             {
-                GameManager.Instance.KarmaScore = GameManager.Instance.KarmaScore - 10;
+                GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] = GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] - 10;
                 // npc sad face
                 StartCoroutine(MoveSadFace(collision.GetComponent<NPC>()));
                 transform.GetComponent<SpriteRenderer>().enabled = false;

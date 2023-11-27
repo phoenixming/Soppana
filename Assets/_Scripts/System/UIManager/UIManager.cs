@@ -6,14 +6,14 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 
-public class UIManager : StaticInstance<WorldGenerateManager>
+public class UIManager : StaticInstance<UIManager>
 {
     public static event Action EatFruit;
 
     [SerializeField] private GameObject[] iconList;
     [SerializeField] private Slider healthSlider;
 
-    [SerializeField] private float HungryRate = 0.1f;
+    [SerializeField] private float HungryRate = 0.05f;
 
     [SerializeField] private PlayerController player;
 
@@ -23,11 +23,20 @@ public class UIManager : StaticInstance<WorldGenerateManager>
 
     [SerializeField] private GameObject EndUI;
     [SerializeField] private TMP_Text EndText;
+    [SerializeField] private Button replayButton;
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private Button resumeButton;
+    [SerializeField] private Button quitButton;
+
+    [SerializeField] private GameObject pauseMenu;
 
     private Dictionary<int, Fruits> itemList;
     private Dictionary<Fruits, int> fruitNumList;
 
     private List<FruitPrefab> fruitList;
+
+    [SerializeField] private List<GameObject> playDataList = new(5);
+    private GameObject playData = null;
 
     public Slider HealthSlider { get => healthSlider; set => healthSlider = value; }
 
@@ -37,7 +46,12 @@ public class UIManager : StaticInstance<WorldGenerateManager>
     {
         Fullup.OnFullup += FullupHealthBar;
 
-
+        replayButton.onClick.AddListener(GameManager.Instance.RePlay);
+        pauseButton.onClick.AddListener(GameManager.Instance.Pause);
+        pauseButton.onClick.AddListener(ShowPauseMenu);
+        resumeButton.onClick.AddListener(GameManager.Instance.Resume);
+        resumeButton.onClick.AddListener(HidePauseMenu);
+        quitButton.onClick.AddListener(GameManager.Instance.Quit);
 
         HealthSlider.value = 1;
 
@@ -60,11 +74,18 @@ public class UIManager : StaticInstance<WorldGenerateManager>
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameManager.Instance.Pause();
+            ShowPauseMenu();
+        }
+
+
         if (GameManager.Instance.isPaulsed)
         {
             return;
         }
-        scoreText.text = GameManager.Instance.KarmaScore.ToString();
+        scoreText.text = GameManager.Instance.karmaScore[GameManager.Instance.playTime-1].ToString();
         if (HealthSlider.value > 0)
         {
             HealthSlider.value -= Time.deltaTime * HungryRate;
@@ -74,7 +95,10 @@ public class UIManager : StaticInstance<WorldGenerateManager>
             HealthSlider.value = 0;
             // end
             EndUI.SetActive(true);
-            EndText.text = $"Your Score is: {GameManager.Instance.KarmaScore}";
+            EndText.text = $"Your Score is: {GameManager.Instance.karmaScore[GameManager.Instance.playTime-1]}";
+            UpdateChart();
+            
+
             GameManager.Instance.isPaulsed = true;
         }
 
@@ -114,7 +138,7 @@ public class UIManager : StaticInstance<WorldGenerateManager>
                     if (itemList[1].FruitName == "Banana")
                     {
                         itemList[1].SpecialAbility.DoAbility();
-                        FruitPrefab fruit = new FruitPrefab();
+                        FruitPrefab fruit = null;
                         for (int i = 0; i < fruitList.Count; i++)
                         {
                             if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
@@ -256,7 +280,7 @@ public class UIManager : StaticInstance<WorldGenerateManager>
         {
             if (itemList.ContainsKey(0))
             {
-                FruitPrefab fruit = new FruitPrefab();
+                FruitPrefab fruit = null;
                 for (int i = 0; i < fruitList.Count; i++)
                 {
                     if (fruitList[i].Fruit.FruitName == itemList[0].FruitName)
@@ -269,15 +293,15 @@ public class UIManager : StaticInstance<WorldGenerateManager>
 
                 if (fruit.FruitState == FruitPrefab.State.Green)
                 {
-                    GameManager.Instance.KarmaScore += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier;
                 }
                 else if (fruit.FruitState == FruitPrefab.State.Yellow)
                 {
-                    GameManager.Instance.KarmaScore += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier * 0.8f;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier * 0.8f;
                 }
                 else
                 {
-                    GameManager.Instance.KarmaScore += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier * 0.6f;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[0].FriendPoint * interactNPC.FriendPointMulitiplier * 0.6f;
                 }
                 Destroy(fruit.gameObject);
                 RemoveInventoryFruit(itemList[0]);
@@ -296,7 +320,7 @@ public class UIManager : StaticInstance<WorldGenerateManager>
         {
             if (itemList.ContainsKey(1))
             {
-                FruitPrefab fruit = new FruitPrefab();
+                FruitPrefab fruit = null;
                 for (int i = 0; i < fruitList.Count; i++)
                 {
                     if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
@@ -309,15 +333,15 @@ public class UIManager : StaticInstance<WorldGenerateManager>
                 
                 if (fruit.FruitState == FruitPrefab.State.Green)
                 {
-                    GameManager.Instance.KarmaScore += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier;
                 }
                 else if (fruit.FruitState == FruitPrefab.State.Yellow)
                 {
-                    GameManager.Instance.KarmaScore += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier * 0.8f;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier * 0.8f;
                 }
                 else
                 {
-                    GameManager.Instance.KarmaScore += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier * 0.6f;
+                    GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1] += itemList[1].FriendPoint * interactNPC.FriendPointMulitiplier * 0.6f;
                 }
                 Destroy(fruit.gameObject);
                 RemoveInventoryFruit(itemList[1]);
@@ -333,7 +357,7 @@ public class UIManager : StaticInstance<WorldGenerateManager>
     {
         if (itemList.ContainsKey(0))
         {
-            FruitPrefab fruit = new FruitPrefab();
+            FruitPrefab fruit = null;
             for (int i = 0; i < fruitList.Count; i++)
             {
                 if (fruitList[i].Fruit.FruitName == itemList[0].FruitName)
@@ -357,7 +381,7 @@ public class UIManager : StaticInstance<WorldGenerateManager>
     { 
         if (itemList.ContainsKey(1))
         {
-            FruitPrefab fruit = new FruitPrefab();
+            FruitPrefab fruit = null;
             for (int i = 0; i < fruitList.Count; i++)
             {
                 if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
@@ -394,7 +418,39 @@ public class UIManager : StaticInstance<WorldGenerateManager>
     }
 
 
-
+    public void UpdateChart()
+    {
+        GameManager.Instance.isEnd = true;
+        for (int i = 0; i < GameManager.Instance.playTime; i++)
+        {
+            playData = playDataList[i];
+            if (playData != null)
+            {
+                foreach (Transform child in playData.transform)
+                {
+                    if (child.gameObject != null)
+                    {
+                        if (child.name == "Header2")
+                        {
+                            child.GetChild(0).GetComponent<TMP_Text>().text = GameManager.Instance.collectCount[i].ToString();
+                        }
+                        else if (child.name == "Header3")
+                        {
+                            child.GetChild(0).GetComponent<TMP_Text>().text = GameManager.Instance.giveCount[i].ToString();
+                        }
+                        else if (child.name == "Header4")
+                        {
+                            child.GetChild(0).GetComponent<TMP_Text>().text = GameManager.Instance.throwCount[i].ToString();
+                        }
+                        else if (child.name == "Header5")
+                        {
+                            child.GetChild(0).GetComponent<TMP_Text>().text = GameManager.Instance.karmaScore[GameManager.Instance.playTime - 1].ToString();
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     IEnumerator MoveSmileFace(NPC interactNPC)
     {
@@ -405,6 +461,19 @@ public class UIManager : StaticInstance<WorldGenerateManager>
             yield return new WaitForSeconds(0.5f);
             face.gameObject.SetActive(false);
         }
+    }
+
+    public void ShowPauseMenu()
+    {
+        if (!GameManager.Instance.isEnd)
+        {
+            pauseMenu.SetActive(true);
+        }
+    }
+
+    public void HidePauseMenu()
+    {
+        pauseMenu.SetActive(false);
     }
 
 }

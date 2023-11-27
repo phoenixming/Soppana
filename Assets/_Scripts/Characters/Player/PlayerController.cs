@@ -26,7 +26,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int gridLength = 1;
     [SerializeField] private int worldSize = 50;
 
+    [SerializeField] private Animator animator;
+
     private bool faceRight = true;
+
 
     public bool CanGive { get => canGive; set => canGive = value; }
 
@@ -57,6 +60,10 @@ public class PlayerController : MonoBehaviour
 
             if (movedirection != Vector2.zero)
             {
+                if (animator.GetBool("Walk") == false)
+                {
+                    animator.SetBool("Walk", true);
+                }
 
                 if (faceRight)
                 {
@@ -81,6 +88,13 @@ public class PlayerController : MonoBehaviour
                     StartCoroutine(Move(moveToPosition));
                 }
             }
+            else
+            {
+                if (animator.GetBool("Walk") == true)
+                {
+                    animator.SetBool("Walk", false);
+                }
+            }
         }
 
 
@@ -89,6 +103,7 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.F))
             {
+                GameManager.Instance.collectCount[GameManager.Instance.playTime - 1]++;
                 fruit.IsStored = true;
                 fruit.GetComponent<SpriteRenderer>().sprite = null;
                 fruit.GetComponent<Collider2D>().enabled = false;
@@ -100,10 +115,12 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
+                GameManager.Instance.giveCount[GameManager.Instance.playTime - 1]++;
                 OnGiveFirstFruit();
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
+                GameManager.Instance.giveCount[GameManager.Instance.playTime - 1]++;
                 OnGiveSecondFruit();
             }
         }
@@ -113,12 +130,14 @@ public class PlayerController : MonoBehaviour
             {
                 //Vector2 position = Input.mousePosition;
                 //Vector2 worldPosition = Camera.main.ScreenToWorldPoint(position);
+                GameManager.Instance.throwCount[GameManager.Instance.playTime - 1]++;
                 OnThrowFirstFruit(faceRight);
             }
             else if (Input.GetKeyDown(KeyCode.X))
             {
                 //Vector2 position = Input.mousePosition;
                 //Vector2 worldPosition = Camera.main.ScreenToWorldPoint(position);
+                GameManager.Instance.throwCount[GameManager.Instance.playTime - 1]++;
                 OnThrowSecondFruit(faceRight);
             }
         }
@@ -129,7 +148,7 @@ public class PlayerController : MonoBehaviour
         walking = true;
         while ((newPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
-            transform.position = Vector3.MoveTowards(transform.position, newPos, speed * Time.fixedDeltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, newPos, speed * Time.deltaTime);
             yield return null;
         }
 
