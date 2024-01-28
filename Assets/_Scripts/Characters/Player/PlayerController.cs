@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
 
     private bool faceRight = true;
 
+    private Vector2 storeVector = Vector2.zero;
+    private Vector2 lastVector = Vector2.zero;
 
     public bool CanGive { get => canGive; set => canGive = value; }
 
@@ -43,22 +45,33 @@ public class PlayerController : MonoBehaviour
     {
         if (GameManager.Instance.isPaulsed)
         {
-            //rb.velocity = Vector2.zero;
-            return;
+            if (!GameManager.Instance.isTutorial || GameManager.Instance.isTutorialPhase1)
+            {
+                return;
+            }
         }
 
         if (!walking)
         {
-            if (movedirection.x != 0)
+
+            storeVector = movedirection;
+
+            if (storeVector.x != 0 && storeVector.x != 1 && storeVector.x != -1)
             {
-                movedirection.y = 0;
-                if (movedirection.x != 1)
+                if (lastVector.x == 0)
                 {
-                    movedirection.x = movedirection.x < 0 ? -1 : 1;
+                    storeVector.y = 0;
+                    storeVector.x = storeVector.x < 0 ? -1 : 1;
                 }
+                else
+                {
+                    storeVector.x = 0;
+                    storeVector.y = storeVector.y < 0 ? -1 : 1;
+                }
+                lastVector = storeVector;
             }
 
-            if (movedirection != Vector2.zero)
+            if (storeVector != Vector2.zero)
             {
                 if (animator.GetBool("Walk") == false)
                 {
@@ -67,7 +80,7 @@ public class PlayerController : MonoBehaviour
 
                 if (faceRight)
                 {
-                    if (movedirection.x < 0)
+                    if (storeVector.x < 0)
                     {
                         this.transform.Rotate(0f, 180f, 0f);
                         faceRight = !faceRight;
@@ -75,14 +88,14 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    if (movedirection.x > 0)
+                    if (storeVector.x > 0)
                     {
                         this.transform.Rotate(0f, 180f, 0f);
                         faceRight = !faceRight;
                     }
                 }
 
-                moveToPosition = transform.position + new Vector3(movedirection.x, movedirection.y, 0) * gridLength;
+                moveToPosition = transform.position + new Vector3(storeVector.x, storeVector.y, 0) * gridLength;
                 if (!(moveToPosition.x >= worldSize / 2 - 1 || moveToPosition.x <= (-1) * (worldSize / 2 - 1) || moveToPosition.y >= worldSize / 2 - 1 || moveToPosition.y <= (-1) * (worldSize / 2 - 1)))
                 {
                     StartCoroutine(Move(moveToPosition));

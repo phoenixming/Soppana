@@ -27,8 +27,10 @@ public class UIManager : StaticInstance<UIManager>
     [SerializeField] private Button pauseButton;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private Button instructionButton;
 
     [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject instructions;
 
     private Dictionary<int, Fruits> itemList;
     private Dictionary<Fruits, int> fruitNumList;
@@ -39,6 +41,7 @@ public class UIManager : StaticInstance<UIManager>
     private GameObject playData = null;
 
     public Slider HealthSlider { get => healthSlider; set => healthSlider = value; }
+    public List<FruitPrefab> FruitList { get => fruitList; set => fruitList = value; }
 
     private bool isMove = false;
 
@@ -52,6 +55,7 @@ public class UIManager : StaticInstance<UIManager>
         resumeButton.onClick.AddListener(GameManager.Instance.Resume);
         resumeButton.onClick.AddListener(HidePauseMenu);
         quitButton.onClick.AddListener(GameManager.Instance.Quit);
+        instructionButton.onClick.AddListener(ShowInstruction);
 
         HealthSlider.value = 1;
 
@@ -68,12 +72,25 @@ public class UIManager : StaticInstance<UIManager>
 
         itemList = new Dictionary<int, Fruits>();
         fruitNumList = new Dictionary<Fruits, int>();
-        fruitList = new List<FruitPrefab>();
+        FruitList = new List<FruitPrefab>();
     }
 
 
     void Update()
     {
+
+        if (GameManager.Instance.isPaulsed)
+        {
+            return;
+        }
+        else
+        {
+            if (!pauseButton.gameObject.activeInHierarchy)
+            {
+                pauseButton.gameObject.SetActive(true);
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             GameManager.Instance.Pause();
@@ -81,10 +98,6 @@ public class UIManager : StaticInstance<UIManager>
         }
 
 
-        if (GameManager.Instance.isPaulsed)
-        {
-            return;
-        }
         scoreText.text = GameManager.Instance.karmaScore[GameManager.Instance.playTime-1].ToString();
         if (HealthSlider.value > 0)
         {
@@ -112,12 +125,12 @@ public class UIManager : StaticInstance<UIManager>
                     {
                         itemList[0].SpecialAbility.DoAbility();
                         FruitPrefab fruit = null;
-                        for (int i = 0; i < fruitList.Count; i++)
+                        for (int i = 0; i < FruitList.Count; i++)
                         {
-                            if (fruitList[i].Fruit.FruitName == itemList[0].FruitName)
+                            if (FruitList[i].Fruit.FruitName == itemList[0].FruitName)
                             {
-                                fruit = fruitList[i];
-                                fruitList.RemoveAt(i);
+                                fruit = FruitList[i];
+                                FruitList.RemoveAt(i);
                                 break;
                             }
                         }
@@ -139,12 +152,12 @@ public class UIManager : StaticInstance<UIManager>
                     {
                         itemList[1].SpecialAbility.DoAbility();
                         FruitPrefab fruit = null;
-                        for (int i = 0; i < fruitList.Count; i++)
+                        for (int i = 0; i < FruitList.Count; i++)
                         {
-                            if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
+                            if (FruitList[i].Fruit.FruitName == itemList[1].FruitName)
                             {
-                                fruit = fruitList[i];
-                                fruitList.RemoveAt(i);
+                                fruit = FruitList[i];
+                                FruitList.RemoveAt(i);
                                 break;
                             }
                         }
@@ -182,7 +195,7 @@ public class UIManager : StaticInstance<UIManager>
                     // increase num
                     fruitNumList[fruit.Fruit] += 1;                    
                     iconList[i].GetComponentInChildren<TMP_Text>().text = fruitNumList[fruit.Fruit].ToString();
-                    fruitList.Add(fruit);
+                    FruitList.Add(fruit);
                     break;
                 }
                 continue;
@@ -192,7 +205,7 @@ public class UIManager : StaticInstance<UIManager>
             {
                 iconList[i].SetActive(true);
                 itemList.Add(i, fruit.Fruit);
-                fruitList.Add(fruit);
+                FruitList.Add(fruit);
                 //fruitList.Add(i, fruit);
                 fruitNumList.Add(fruit.Fruit, 1);
                 iconList[i].GetComponent<Image>().sprite = fruit.Fruit.FruitImage;
@@ -200,7 +213,7 @@ public class UIManager : StaticInstance<UIManager>
             else
             {
                 fruitNumList[fruit.Fruit] += 1;
-                fruitList.Add(fruit);
+                FruitList.Add(fruit);
                 var count = itemList.FirstOrDefault(x => x.Value == fruit.Fruit).Key;
                 iconList[count].GetComponentInChildren<TMP_Text>().text = fruitNumList[fruit.Fruit].ToString();
             }
@@ -209,9 +222,9 @@ public class UIManager : StaticInstance<UIManager>
     }
 
 
-    private void RemoveInventory(FruitPrefab fruit)
+    public void RemoveInventory(FruitPrefab fruit)
     {
-        fruitList.Remove(fruit);
+        FruitList.Remove(fruit);
         for (int i = 0; i < iconList.Length; i++)
         {
             if (iconList[i].activeInHierarchy)
@@ -281,12 +294,12 @@ public class UIManager : StaticInstance<UIManager>
             if (itemList.ContainsKey(0))
             {
                 FruitPrefab fruit = null;
-                for (int i = 0; i < fruitList.Count; i++)
+                for (int i = 0; i < FruitList.Count; i++)
                 {
-                    if (fruitList[i].Fruit.FruitName == itemList[0].FruitName)
+                    if (FruitList[i].Fruit.FruitName == itemList[0].FruitName)
                     {
-                        fruit = fruitList[i];
-                        fruitList.RemoveAt(i);
+                        fruit = FruitList[i];
+                        FruitList.RemoveAt(i);
                         break;
                     }
                 }
@@ -321,12 +334,12 @@ public class UIManager : StaticInstance<UIManager>
             if (itemList.ContainsKey(1))
             {
                 FruitPrefab fruit = null;
-                for (int i = 0; i < fruitList.Count; i++)
+                for (int i = 0; i < FruitList.Count; i++)
                 {
-                    if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
+                    if (FruitList[i].Fruit.FruitName == itemList[1].FruitName)
                     {
-                        fruit = fruitList[i];
-                        fruitList.RemoveAt(i);
+                        fruit = FruitList[i];
+                        FruitList.RemoveAt(i);
                         break;
                     }
                 }
@@ -358,12 +371,12 @@ public class UIManager : StaticInstance<UIManager>
         if (itemList.ContainsKey(0))
         {
             FruitPrefab fruit = null;
-            for (int i = 0; i < fruitList.Count; i++)
+            for (int i = 0; i < FruitList.Count; i++)
             {
-                if (fruitList[i].Fruit.FruitName == itemList[0].FruitName)
+                if (FruitList[i].Fruit.FruitName == itemList[0].FruitName)
                 {
-                    fruit = fruitList[i];
-                    fruitList.RemoveAt(i);
+                    fruit = FruitList[i];
+                    FruitList.RemoveAt(i);
                     break;
                 }
             }
@@ -382,12 +395,12 @@ public class UIManager : StaticInstance<UIManager>
         if (itemList.ContainsKey(1))
         {
             FruitPrefab fruit = null;
-            for (int i = 0; i < fruitList.Count; i++)
+            for (int i = 0; i < FruitList.Count; i++)
             {
-                if (fruitList[i].Fruit.FruitName == itemList[1].FruitName)
+                if (FruitList[i].Fruit.FruitName == itemList[1].FruitName)
                 {
-                    fruit = fruitList[i];
-                    fruitList.RemoveAt(i);
+                    fruit = FruitList[i];
+                    FruitList.RemoveAt(i);
                     break;
                 }
             }            
@@ -474,6 +487,20 @@ public class UIManager : StaticInstance<UIManager>
     public void HidePauseMenu()
     {
         pauseMenu.SetActive(false);
+    }
+
+    public void ShowInstruction()
+    {
+        
+        if (instructions.activeInHierarchy)
+        {
+            instructions.SetActive(false);
+        }
+        else
+        {
+            instructions.SetActive(true);
+        }
+
     }
 
 }

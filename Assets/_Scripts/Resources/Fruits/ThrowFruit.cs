@@ -26,7 +26,10 @@ public class ThrowFruit : MonoBehaviour
     {
         if (GameManager.Instance.isPaulsed)
         {
-            return;
+            if (!GameManager.Instance.isTutorial)
+            {
+                return;
+            }
         }
 
         if (canMove)

@@ -18,6 +18,14 @@ public class GameManager : PersistentSingleton<GameManager>
 
     public bool isEnd = false;
 
+    public bool isTutorial = true;
+    public bool isTutorialPhase1 = true;
+    public bool isTutorialPhase2 = false;
+    public bool isTutorialPhase3 = false;
+    public bool isTutorialPhase4 = false;
+    public bool isTutorialPhase5 = false;
+    public bool isTutorialPhase6 = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -65,5 +73,7 @@ public class GameManager : PersistentSingleton<GameManager>
     {
         isPaulsed = false;
     }
+
+
 
 }
